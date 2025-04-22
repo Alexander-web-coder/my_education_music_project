@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routes import track
+from app.routes import track, users
 
 app = FastAPI(
     title="Трекер музыкальных предпочтений",
@@ -22,3 +22,4 @@ app = FastAPI(
 #     return {"Заглушка":"Новый проект"}
 
 app.include_router(track.router)
+app.include_router(users.router)

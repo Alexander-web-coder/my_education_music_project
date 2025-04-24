@@ -1,0 +1,16 @@
+# docker-compose.yml
+services:
+  my-education-music-project-db:
+    image: postgres:12.5
+  #Разработка серверных приложений с помощью FastAPI
+    environment:
+      POSTGRES_USER: fastapi_music
+      POSTGRES_PASSWORD: fastapi_music
+      POSTGRES_DB: music_project
+    ports:
+      - "5432:5432"
+    networks:
+    - my-education-music-project
+networks:
+    my-education-music-project:
+      driver: bridge

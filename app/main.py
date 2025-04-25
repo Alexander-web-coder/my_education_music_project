@@ -4,7 +4,7 @@ from app.routers import track, users, ratings
 
 app = FastAPI(
     title="Трекер музыкальных предпочтений",
-    description="Учебный проект для сбора статистики музыкальных предпочтений на"
+    description="Учебный проект для сбора статистики музыкальных предпочтений на "
                 "фреймворке FastAPI.",
     version="0.0.1",
     contact={

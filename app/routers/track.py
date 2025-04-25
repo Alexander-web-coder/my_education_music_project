@@ -17,18 +17,9 @@ def get_full_list():  #TODO
     pass
 
 
-
-
-
-
-
-
 @router.post("/create_track", status_code=status.HTTP_201_CREATED)
 def create_track():  #TODO
     pass
-
-
-
 
 
 @router.delete("/delete_track", status_code=status.HTTP_204_NO_CONTENT)

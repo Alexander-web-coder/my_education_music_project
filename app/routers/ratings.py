@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, status
 
 
 router = APIRouter(prefix="/ratings", tags=["Операции с оценками"])

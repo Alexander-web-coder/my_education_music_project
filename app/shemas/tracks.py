@@ -13,6 +13,6 @@ class User(BaseModel): #TODO
     #hash: str надо подумать
 
 
-class ratings(Track, User): #TODO
+class Ratings(Track, User): #TODO
     """отправляет название и автора трека, оценку и логин"""
     estimate: int

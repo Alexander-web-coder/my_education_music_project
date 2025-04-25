@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import track, users
+from app.routers import track, users, ratings
 
 
 app = FastAPI(
@@ -24,3 +24,4 @@ app = FastAPI(
 
 app.include_router(track.router)
 app.include_router(users.router)
+app.include_router(ratings.router)

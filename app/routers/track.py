@@ -1,6 +1,7 @@
 from fastapi import APIRouter, status, Depends
 from sqlmodel import Session, select, text
 from app.db import  get_session
+from app.models.models import Track as Track_db
 
 
 router = APIRouter(prefix="/tracks", tags=["Операции с треками"])
@@ -18,8 +19,11 @@ def get_full_list():  #TODO
 
 
 @router.post("/create_track", status_code=status.HTTP_201_CREATED)
-def create_track():  #TODO
-    pass
+def create_track(track: Track_db, session: Session = Depends(get_session)):
+    session.add(track)
+    session.commit()
+    session.refresh(track)
+    return track
 
 
 @router.delete("/delete_track", status_code=status.HTTP_204_NO_CONTENT)

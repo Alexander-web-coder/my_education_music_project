@@ -1,8 +1,17 @@
 from fastapi import FastAPI
 from app.routers import track, users, ratings
 
+from contextlib import asynccontextmanager  # Uncomment if you need to create tables on app start >>>
+from app.db import init_database
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+   init_database()
+   yield
+
 
 app = FastAPI(
+    lifespan=lifespan,
     title="Трекер музыкальных предпочтений",
     description="Учебный проект для сбора статистики музыкальных предпочтений на "
                 "фреймворке FastAPI.",

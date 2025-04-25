@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.routers import track, users
 
+
 app = FastAPI(
     title="Трекер музыкальных предпочтений",
     description="Учебный проект для сбора статистики музыкальных предпочтений на"

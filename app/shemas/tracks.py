@@ -3,7 +3,7 @@ from pydantic import BaseModel
 class Track(BaseModel): #TODO
     title: str
     author: str
-    genre: list[str] = None
+    genre: str = None
 
 
 class User(BaseModel): #TODO

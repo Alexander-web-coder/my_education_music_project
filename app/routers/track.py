@@ -1,7 +1,9 @@
 from fastapi import APIRouter, status, Depends
+from rich.progress import track
 from sqlmodel import Session, select, text
 from app.db import  get_session
 from app.models.models import Track as Track_db
+from app.shemas.tracks import Track
 
 
 router = APIRouter(prefix="/tracks", tags=["Операции с треками"])
@@ -19,10 +21,15 @@ def get_full_list():  #TODO
 
 
 @router.post("/create_track", status_code=status.HTTP_201_CREATED)
-def create_track(track: Track_db, session: Session = Depends(get_session)):
-    session.add(track)
+def create_track(track: Track, session: Session = Depends(get_session)):
+    new_track = Track_db(
+        title = track.title,
+        author = track.author,
+        genre = track.genre
+    )
+    session.add(new_track)
     session.commit()
-    session.refresh(track)
+    session.refresh(new_track)
     return track
 
 

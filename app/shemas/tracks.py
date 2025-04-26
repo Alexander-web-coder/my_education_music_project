@@ -1,4 +1,6 @@
-from pydantic import BaseModel
+from dataclasses import Field
+
+from pydantic import BaseModel, Field
 
 class Track(BaseModel): #TODO
     title: str
@@ -16,3 +18,6 @@ class User(BaseModel): #TODO
 class Ratings(Track, User): #TODO
     """отправляет название и автора трека, оценку и логин"""
     estimate: int
+
+class DeleteTrack(BaseModel):
+    id: int

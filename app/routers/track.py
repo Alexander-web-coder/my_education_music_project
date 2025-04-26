@@ -1,5 +1,4 @@
 from fastapi import APIRouter, status, Depends
-from rich.progress import track
 from sqlmodel import Session, select, text
 from app.db import  get_session
 from app.models.models import Track as Track_db
@@ -16,8 +15,9 @@ def test_database(session: Session = Depends(get_session)):
 
 
 @router.get("/get_full_list", status_code=status.HTTP_200_OK)
-def get_full_list():  #TODO
-    pass
+def get_full_list(session: Session = Depends(get_session)):  #TODO
+    result = session.exec(select(Track_db)).all()
+    return result
 
 
 @router.post("/create_track", status_code=status.HTTP_201_CREATED)

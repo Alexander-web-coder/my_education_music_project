@@ -31,10 +31,10 @@ def decode_token(token: str):
         return None
 
 def get_current_user(token: str = Depends(oauth2_scheme), session = Depends(get_session)) -> User:
-    username = decode_token(token)
-    if not username:
+    login = decode_token(token)
+    if not login:
         raise HTTPException(status_code=401, detail="Невалидный токен")
-    user = session.exec(select(User).where(User.username == username)).first()
+    user = session.exec(select(User).where(User.login == login)).first()
     if not user:
         raise HTTPException(status_code=401, detail="Пользователь не найден")
     return user

@@ -21,3 +21,7 @@ class Ratings(Track, User): #TODO
 
 class DeleteTrack(BaseModel):
     id: int
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str

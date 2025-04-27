@@ -2,7 +2,7 @@ from fastapi import APIRouter, status, Depends
 from sqlmodel import Session, select, text
 from app.db import  get_session
 from app.models.models import Track as Track_db
-from app.shemas.tracks import Track, DeleteTrack
+from app.schemas.tracks import Track, DeleteTrack
 
 
 router = APIRouter(prefix="/tracks", tags=["Операции с треками"])

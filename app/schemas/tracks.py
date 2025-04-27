@@ -16,7 +16,9 @@ class User(BaseModel): #TODO
 
 
 class Ratings(Track, User): #TODO
-    """отправляет название и автора трека, оценку и логин"""
+    """оценка трека, текущий юзер"""
+    #hash: str
+    track_id: int
     estimate: int
 
 class DeleteTrack(BaseModel):

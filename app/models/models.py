@@ -11,9 +11,10 @@ class Track(SQLModel, table=True):
 
 class User(SQLModel, table=True):
     id: int = SQLField(default=None, nullable=False, primary_key=True)
-    first_name: str
-    last_name: str
-    email: str = SQLField(default=None)
+    login: str = SQLField(unique=True)
+    first_name: str = SQLField(default=None, nullable=True)
+    last_name: str = SQLField(default=None, nullable=True)
+    email: str = SQLField(default=None, nullable=True)
     hashed_password: str
 
 class Ratings(SQLModel, table=True):

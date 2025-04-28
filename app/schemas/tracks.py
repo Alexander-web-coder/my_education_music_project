@@ -19,7 +19,7 @@ class Ratings(BaseModel): #TODO
     """оценка трека, текущий юзер"""
     #hash: str
     track_id: int
-    estimate: int
+    estimate: int = Field(gt=0, lt=6)
 
 class DeleteTrack(BaseModel):
     id: int

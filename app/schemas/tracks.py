@@ -15,7 +15,7 @@ class User(BaseModel): #TODO
     #hash: str надо подумать
 
 
-class Ratings(Track, User): #TODO
+class Ratings(BaseModel): #TODO
     """оценка трека, текущий юзер"""
     #hash: str
     track_id: int

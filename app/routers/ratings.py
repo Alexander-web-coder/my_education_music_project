@@ -9,7 +9,7 @@ router = APIRouter(prefix="/ratings", tags=["Операции с оценкам�
 
 @router.patch("/set_rating", status_code=status.HTTP_201_CREATED)
 def set_rating(rating: Ratings, login=Depends(get_current_user), session=Depends(get_session)):
-    statement = select(User).where(User.login == login)
+    statement = select(User).where(User.login == login.login)
     user_exist_id = session.exec(statement).first()
     new_rating = Rating_db(
         user_id  = user_exist_id.id,

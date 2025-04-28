@@ -1,18 +1,26 @@
 from fastapi import APIRouter, status, Depends
+from sqlmodel import Session, select, func, and_, not_
+from typing import List
+from sqlalchemy.sql import exists
 from sqlmodel import  select
+from sqlmodel import Session, select, func, and_, not_
+from typing import List
+from sqlalchemy.sql.expression import exists
 from app.db import get_session
 from core.security import get_current_user
 from app.schemas.tracks import Ratings
-from app.models.models import Ratings as Rating_db, User
+from app.models.models import Ratings as Rating_db, User, Track
 
 router = APIRouter(prefix="/ratings", tags=["Операции с оценками"])
 
-@router.patch("/set_rating", status_code=status.HTTP_201_CREATED)
+@router.patch("/set_rating", status_code=status.HTTP_201_CREATED) -> Rating_db:
 def set_rating(rating: Ratings, login=Depends(get_current_user), session=Depends(get_session)):
-    statement = select(User).where(User.login == login.login)
-    user_exist_id = session.exec(statement).first()
+    """Устанавливает оценку треку, требуется логин юзера"""
+    # statement = select(User).where(User.login == login.login)
+    # user_exist_id = session.exec(statement).first()
     new_rating = Rating_db(
-        user_id  = user_exist_id.id,
+        # user_id  = user_exist_id.id,
+        user_id = login.id,
         track_id = rating.track_id,
         estimate = rating.estimate
     )
@@ -22,11 +30,132 @@ def set_rating(rating: Ratings, login=Depends(get_current_user), session=Depends
     return new_rating
 
 
-
+#лишнее, убрать
 @router.get("/get_top", status_code=status.HTTP_200_OK)
 def get_top():  #TODO
     pass
 
 @router.get("/get_my_recommend", status_code=status.HTTP_200_OK)
-def get_my_recommend():  #TODO
-    pass
+def get_my_recommend(user_id: int, session: Session = Depends(get_session)) -> List[Track]:
+    """Возвращает список рекомендованных треков для указанного юзера"""
+
+    # Получаем любимые жанры юзера
+    stmt = (
+        select(Track.genre)
+        .join(Rating_db, Rating_db.track_id == Track.id)
+        .where(and_(
+            Rating_db.user_id == user_id,
+            Rating_db.estimate >= 4
+        ))
+        .group_by(Track.genre)
+        .order_by(func.count().desc())
+        .limit(2)
+    )
+    user_genres = [genre for (genre) in session.exec(stmt).all()]
+
+    if not user_genres:
+        return []
+
+    #  Находим похожих юзеров(высоко оценили треки этих  жанров)
+    stmt = (
+        select(Rating_db.user_id)
+        .join(Track, Track.id == Rating_db.track_id)
+        .where(and_(
+            Rating_db.user_id != user_id,
+            Rating_db.estimate >= 4,
+            Track.genre.in_(user_genres)
+        ))
+        .group_by(Rating_db.user_id)
+        .having(func.count() >= 2)
+    )
+    similar_users = [user_id for (user_id) in session.exec(stmt).all()]
+
+    if not similar_users:
+        return []
+
+    # Получаем треки, которые высоко оценили похожие юзеры
+    stmt = (select(Track).join(Rating_db, Rating_db.track_id == Track.id).where(
+        and_(Rating_db.user_id.in_(similar_users), Rating_db.estimate >= 4, Track.genre.in_(user_genres))).group_by(
+            Track.id))
+
+    # Находим треки, которые юзер уже оценил
+    rated_tracks =[
+        track_id for (track_id) in session.exec(
+        select(Rating_db.track_id)
+        .where(Rating_db.user_id == user_id)
+    ).all()]
+
+    # Исключаем оцененные треки
+    if rated_tracks:
+        stmt = stmt.where(Track.id.not_in(rated_tracks))
+
+    # Сортируем и ограничиваем результат
+    stmt = (
+        stmt.order_by(
+            func.count().desc(),
+            func.avg(Rating_db.estimate).desc()
+        )
+        .limit(3)
+    )
+
+    return session.exec(stmt).all()
+
+# def get_my_recommend(login=Depends(get_current_user), session=Depends(get_session)):
+# def get_music_recommendations(user_id: int, session: Session = Depends(get_session)) -> List[Track]:
+# def get_music_recommendations(user_id: int, session: Session = Depends(get_session)):
+#     """Возвращает список рекомендованных треков """
+#
+#     # 1. Определяем 2 самых любимых жанра
+#     user_genres_subq = (
+#         select(Track.genre)
+#         .join(Rating_db, Rating_db.track_id == Track.id)
+#         .where(and_(
+#             Rating_db.user_id == user_id,
+#             Rating_db.estimate >= 4
+#         ))
+#         .group_by(Track.genre)
+#         .order_by(func.count().desc())
+#         .limit(2)
+#         .subquery()
+#     )
+#
+#     # 2. Находим ID
+#     similar_users_subq = (
+#         select(Rating_db.user_id)
+#         .join(Track, Track.id == Rating_db.track_id)
+#         .where(and_(
+#             Rating_db.user_id != user_id,
+#             Rating_db.estimate >= 4,
+#             Track.genre.in_(select(user_genres_subq.c.genre))
+#         ))
+#         .group_by(Rating_db.user_id)
+#         .having(func.count() >= 2)
+#         .subquery()
+#     )
+#
+#     # 3. Получаем рекомендации треков
+#     recommendations = session.exec(
+#         select(Track)
+#         .join(Rating_db, Rating_db.track_id == Track.id)
+#         .where(and_(
+#             Rating_db.user_id.in_(select(similar_users_subq.c.user_id)),
+#             Rating_db.estimate >= 4,
+#             Track.genre.in_(select(user_genres_subq.c.genre)),
+#             not_(exists(
+#                 select(Rating_db.id)
+#                 .where(and_(
+#                     Rating_db.user_id == user_id,
+#                     Rating_db.track_id == Track.id
+#                 ))
+#             ))
+#         ))
+#         .group_by(Track.id)
+#         .order_by(
+#             func.count().desc(),
+#             func.avg(Rating_db.estimate).desc()
+#         )
+#         .limit(3)
+#     ).all()
+#
+#     # return recommendations
+#     return None

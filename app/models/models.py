@@ -21,4 +21,4 @@ class Ratings(SQLModel, table=True):
     id: int = SQLField(default=None, nullable=False, primary_key=True)
     user_id: int = SQLField(default=None, nullable=False, foreign_key="user.id")
     track_id: int = SQLField(default=None, nullable=False, foreign_key="track.id")
-    estimate: int = SQLField(gt=0, le=11)
+    estimate: int = SQLField(gt=0, le=6)

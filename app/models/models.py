@@ -1,6 +1,6 @@
 from markdown_it.rules_block import table
 from pygments.lexer import default
-from sqlmodel import SQLModel, Field as SQLField
+from sqlmodel import SQLModel, Field as SQLField, UniqueConstraint
 
 
 class Track(SQLModel, table=True):
@@ -18,6 +18,10 @@ class User(SQLModel, table=True):
     hashed_password: str
 
 class Ratings(SQLModel, table=True):
+    __table_args__ = (
+        UniqueConstraint('user_id', 'track_id', name='user_and_track_constraint'),
+    )
+
     id: int = SQLField(default=None, nullable=False, primary_key=True)
     user_id: int = SQLField(default=None, nullable=False, foreign_key="user.id")
     track_id: int = SQLField(default=None, nullable=False, foreign_key="track.id")

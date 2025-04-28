@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 from app.routers import track, users, ratings
+from fastapi import APIRouter, status, Depends, HTTPException, Request
+from fastapi.responses import JSONResponse
+from sqlalchemy.exc import SQLAlchemyError, InternalError, IntegrityError
 
 from contextlib import asynccontextmanager  # Uncomment if you need to create tables on app start >>>
 from app.db import init_database
@@ -30,6 +33,13 @@ app = FastAPI(
 # @app.get("/")
 # def root():
 #     return {"Заглушка":"Новый проект"}
+@app.exception_handler(SQLAlchemyError)
+async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
+    # Для ошибок целостности (например, дублирование уникального ключа)
+    return JSONResponse(
+            status_code=400,
+            content={"message": "Возможно, запись уже существует или нарушены ограничения базы данных"},
+        )
 
 app.include_router(track.router)
 app.include_router(users.router)

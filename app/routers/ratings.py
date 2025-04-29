@@ -32,7 +32,8 @@ def set_rating(rating: Ratings, login=Depends(get_current_user), session=Depends
 
 #лишнее, убрать
 @router.patch("/change_rating", status_code=status.HTTP_201_CREATED)
-def set_rating(rating: Ratings, login=Depends(get_current_user), session=Depends(get_session)): # -> Rating_db:
+def set_rating(rating: Ratings, login=Depends(get_current_user), session=Depends(get_session),
+               response_model=Ratings): # -> Rating_db:
     """Меняет оценку трека, требуется логин юзера"""
     # statement = select(User).where(User.login == login.login)
     # user_exist_id = session.exec(statement).first()
@@ -49,7 +50,7 @@ def set_rating(rating: Ratings, login=Depends(get_current_user), session=Depends
     new_rating = session.exec(stmt).all()
     if new_rating == []:
         raise HTTPException(
-            status_code=status.HTTP_204_NO_CONTENT,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Оценки не существует. Для создания оценки воспользуйтесь /set_rating."
         )
 

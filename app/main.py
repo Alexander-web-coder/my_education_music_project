@@ -15,7 +15,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     lifespan=lifespan,
-    title="Трекер музыкальных предпочтений",
+    title="Сервис музыкальных рекомендаций",
     description="Учебный проект для сбора статистики музыкальных предпочтений на "
                 "фреймворке FastAPI.",
     version="0.0.1",
@@ -30,9 +30,10 @@ app = FastAPI(
     }
 )
 
-# @app.get("/")
-# def root():
-#     return {"Заглушка":"Новый проект"}
+@app.get("/")
+def root():
+    return {"Информация":"перейдите на http://127.0.0.1:8000/docs"}
+
 @app.exception_handler(SQLAlchemyError)
 async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
     # Для ошибок целостности (например, дублирование уникального ключа)

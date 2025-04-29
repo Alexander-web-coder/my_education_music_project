@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status, Depends, HTTPException
 from sqlmodel import Session, select, func, and_, not_
 from typing import List
 from sqlalchemy.sql import exists
@@ -31,9 +31,36 @@ def set_rating(rating: Ratings, login=Depends(get_current_user), session=Depends
 
 
 #лишнее, убрать
-@router.get("/get_top", status_code=status.HTTP_200_OK)
-def get_top():  #TODO
-    pass
+@router.patch("/change_rating", status_code=status.HTTP_201_CREATED)
+def set_rating(rating: Ratings, login=Depends(get_current_user), session=Depends(get_session)): # -> Rating_db:
+    """Меняет оценку трека, требуется логин юзера"""
+    # statement = select(User).where(User.login == login.login)
+    # user_exist_id = session.exec(statement).first()
+    # new_rating = Rating_db(
+    #     # user_id  = user_exist_id.id,
+    #     user_id = login.id,
+    #     track_id = rating.track_id,
+    #     estimate = rating.estimate
+    # )
+    stmt = select(Rating_db).where(and_(
+        Rating_db.user_id == login.id,
+        Rating_db.track_id == rating.track_id))
+    # new_rating = session.scalars(stmt).one()
+    new_rating = session.exec(stmt).all()
+    if new_rating == []:
+        raise HTTPException(
+            status_code=status.HTTP_204_NO_CONTENT,
+            detail=f"Оценки не существует. Для создания оценки воспользуйтесь /set_rating."
+        )
+
+    # stmt = select(Rating_db).where(and_(
+    #     Rating_db.user_id == login.id,
+    #     Rating_db.track_id == rating.track_id))
+    new_rating = session.scalars(stmt).one()
+    new_rating.estimate = rating.estimate
+    session.commit()
+    session.refresh(new_rating)
+    return new_rating
 
 @router.get("/get_my_recommend", status_code=status.HTTP_200_OK)
 def get_my_recommend(user_id: int, session: Session = Depends(get_session)) -> List[Track]:

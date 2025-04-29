@@ -29,12 +29,14 @@ def test_database(session: Session = Depends(get_session)):
 
 @router.get("/get_full_list", status_code=status.HTTP_200_OK)
 def get_full_list(session: Session = Depends(get_session)):
+    """Возвращает полный лист треков"""
     result = session.exec(select(Track_db)).all()
     return result
 
 
 @router.post("/create_track", status_code=status.HTTP_201_CREATED)
 def create_track(track: Track, session: Session = Depends(get_session)):
+    """Создает запись о треке"""
     new_track = Track_db(
         title = track.title,
         author = track.author,
@@ -54,6 +56,7 @@ def create_track(track: Track, session: Session = Depends(get_session)):
 
 @router.delete("/delete_track", status_code=status.HTTP_204_NO_CONTENT)
 def delete_track(track_id: DeleteTrack, session: Session = Depends(get_session)):
+    """Удаляет запись о треке."""
     # for_delete = session.exec(select(Track_db).where(Track_db.id == track_id.id))
     stmt = select(Track_db).where(Track_db.id == track_id.id)
     results = session.exec(stmt)

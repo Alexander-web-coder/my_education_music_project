@@ -10,6 +10,7 @@ router = APIRouter(prefix="/users", tags=["Операции с пользова�
 
 @router.post("/create_user", status_code=status.HTTP_201_CREATED)
 def create_user(login: str, password: str, session = Depends(get_session)):
+    """Создает нового пользователя"""
     user_exists = session.exec(select(User).where(User.login == login)).first()
     if user_exists:
         raise HTTPException(status_code=400, detail="Пользователь уже существует")
@@ -20,12 +21,9 @@ def create_user(login: str, password: str, session = Depends(get_session)):
 
 @router.post("/token", response_model=Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), session = Depends(get_session)):
+    """Аутентифицирует пользователя, возвращает токен"""
     user = session.exec(select(User).where(User.login == form_data.username)).first()
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Неверный логин или пароль")
     access_token = create_access_token(data={"sub": user.login})
     return {"access_token": access_token, "token_type": "bearer"}
-
-@router.delete("/delete_user", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(): #TODO
-    pass

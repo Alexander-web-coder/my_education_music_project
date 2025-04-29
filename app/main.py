@@ -38,7 +38,7 @@ async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
     # Для ошибок целостности (например, дублирование уникального ключа)
     return JSONResponse(
             status_code=400,
-            content={"message": "Возможно, запись уже существует или нарушены ограничения базы данных"},
+            content={"message": "Нарушены ограничения базы данных. Запись не уникальна либо не существует."},
         )
 
 app.include_router(track.router)

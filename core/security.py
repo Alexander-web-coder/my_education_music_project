@@ -6,7 +6,15 @@ from fastapi.security import OAuth2PasswordBearer
 from app.db import get_session
 from sqlmodel import select
 from app.models.models import User
-from app.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from app.config import settings as cnf
+#from app.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+
+
+SECRET_KEY = cnf.secret_key
+ALGORITHM = cnf.algo
+ACCESS_TOKEN_EXPIRE_MINUTES = cnf.access_token_expire_minutes
+
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")

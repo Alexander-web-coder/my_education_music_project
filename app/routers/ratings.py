@@ -1,15 +1,11 @@
 from fastapi import APIRouter, status, Depends, HTTPException
-from sqlmodel import Session, select, func, and_, not_
+from sqlalchemy.exc import SQLAlchemyError
+from sqlmodel import Session, select, func, and_
 from typing import List
-from sqlalchemy.sql import exists
-from sqlmodel import  select
-from sqlmodel import Session, select, func, and_, not_
-from typing import List
-from sqlalchemy.sql.expression import exists
 from app.db import get_session
-from core.security import get_current_user
+from app.core.security import get_current_user
 from app.schemas.tracks import Ratings
-from app.models.models import Ratings as Rating_db, User, Track
+from app.models.models import Ratings as Rating_db, Track
 
 router = APIRouter(prefix="/ratings", tags=["Операции с оценками"])
 
@@ -24,13 +20,19 @@ def set_rating(rating: Ratings, login=Depends(get_current_user), session=Depends
         track_id = rating.track_id,
         estimate = rating.estimate
     )
-    session.add(new_rating)
-    session.commit()
-    session.refresh(new_rating)
+    try:
+        session.add(new_rating)
+        session.commit()
+        session.refresh(new_rating)
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Трека не существует."
+            )
     return new_rating
 
 
-#лишнее, убрать
+
 @router.patch("/change_rating", status_code=status.HTTP_201_CREATED)
 def set_rating(rating: Ratings, login=Depends(get_current_user), session=Depends(get_session),
                response_model=Ratings): # -> Rating_db:
@@ -47,20 +49,26 @@ def set_rating(rating: Ratings, login=Depends(get_current_user), session=Depends
         Rating_db.user_id == login.id,
         Rating_db.track_id == rating.track_id))
     # new_rating = session.scalars(stmt).one()
-    new_rating = session.exec(stmt).all()
-    if new_rating == []:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Оценки не существует. Для создания оценки воспользуйтесь /set_rating."
-        )
+    # new_rating = session.exec(stmt).all()
+    # if new_rating == []:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_404_NOT_FOUND,
+    #         detail=f"Оценки не существует. Для создания оценки воспользуйтесь /set_rating."
+    #     )
 
     # stmt = select(Rating_db).where(and_(
     #     Rating_db.user_id == login.id,
     #     Rating_db.track_id == rating.track_id))
-    new_rating = session.scalars(stmt).one()
-    new_rating.estimate = rating.estimate
-    session.commit()
-    session.refresh(new_rating)
+    try:
+        new_rating = session.scalars(stmt).one()
+        new_rating.estimate = rating.estimate
+        session.commit()
+        session.refresh(new_rating)
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Оценки не существует. Для создания оценки воспользуйтесь /set_rating."
+            )
     return new_rating
 
 @router.get("/get_my_recommend", status_code=status.HTTP_200_OK)
@@ -84,7 +92,7 @@ def get_my_recommend(user_id: int, session: Session = Depends(get_session)) -> L
     if not user_genres:
         return []
 
-    #  Находим похожих юзеров(высоко оценили треки этих  жанров)
+    #  Находим похожих юзеров(высоко оценили треки этих жанров)
     stmt = (
         select(Rating_db.user_id)
         .join(Track, Track.id == Rating_db.track_id)
@@ -103,7 +111,8 @@ def get_my_recommend(user_id: int, session: Session = Depends(get_session)) -> L
 
     # Получаем треки, которые высоко оценили похожие юзеры
     stmt = (select(Track).join(Rating_db, Rating_db.track_id == Track.id).where(
-        and_(Rating_db.user_id.in_(similar_users), Rating_db.estimate >= 4, Track.genre.in_(user_genres))).group_by(
+        and_(Rating_db.user_id.in_(similar_users),
+             Rating_db.estimate >= 4, Track.genre.in_(user_genres))).group_by(
             Track.id))
 
     # Находим треки, которые юзер уже оценил

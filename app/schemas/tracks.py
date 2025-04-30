@@ -10,8 +10,9 @@ class Track(BaseModel): #TODO
 
 class User(BaseModel): #TODO
     login: str
-    first_name: str
-    last_name: str
+    password: str
+    # first_name: str
+    # last_name: str
     #hash: str надо подумать
 
 

@@ -47,10 +47,8 @@ def create_track(track: Track, session: Session = Depends(get_session)):
         session.commit()
         session.refresh(new_track)
     except SQLAlchemyError as e:
-        # raise HTTPException(status_code=status.HTTP_100_CONTINUE,
-        #                     detail="Ошибка записи в базу. Возможно, оценка уже поставлена.")
-        raise
-
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Комбинация трек\автор должна быть уникальной.")
     return track
 
 
@@ -59,10 +57,15 @@ def delete_track(track_id: DeleteTrack, session: Session = Depends(get_session))
     """Удаляет запись о треке."""
     # for_delete = session.exec(select(Track_db).where(Track_db.id == track_id.id))
     stmt = select(Track_db).where(Track_db.id == track_id.id)
-    results = session.exec(stmt)
-    for_delete = results.one()
-    session.delete(for_delete)
-    session.commit()
+    try:
+        results = session.exec(stmt)
+        for_delete = results.one()
+        session.delete(for_delete)
+        session.commit()
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Трека не существует.")
+
     return for_delete
 
 

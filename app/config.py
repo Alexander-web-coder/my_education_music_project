@@ -1,11 +1,8 @@
-# SECRET_KEY = "secret_key_for_demo"
-# ALGORITHM = "HS256"
-# ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
+"""Модуль для класс для конфигурации"""
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 class Settings(BaseSettings):
+    """Класс для конфигурации"""
     model_config = SettingsConfigDict(env_file=".env")
     db_username: str
     db_password: str

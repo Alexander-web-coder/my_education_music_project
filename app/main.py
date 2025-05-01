@@ -33,7 +33,7 @@ app = FastAPI(
 @app.get("/", status_code=status.HTTP_200_OK, tags=["Главная страница"])
 def root() -> dict:
     """Заглавная страница"""
-    return {"Информация":"перейдите на http://127.0.0.1:80/docs"}
+    return {"Для информации":"перейдите на http://127.0.0.1:80/docs"}
 
 
 app.include_router(tracks.router)

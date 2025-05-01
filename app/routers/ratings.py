@@ -62,10 +62,11 @@ def change_rating(rating: Ratings, login=Depends(get_current_user),
             ) from _
     return new_rating
 
-@router.get("/get_my_recommend", status_code=status.HTTP_200_OK)
+@router.get("/get_my_recommendations", status_code=status.HTTP_200_OK)
 def get_my_recommend(user_id: int, session: Session = Depends(get_session)) -> List[Track]:
     """Возвращает список рекомендованных треков для указанного юзера"""
-
+    # кол-во предпочитаемых жанров. Чем больше, тем хаотичнее выборка, чем меньше, тем тривиальнее
+    genre_limit = 2
     # Получаем любимые жанры юзера
     stmt = (
         select(Track.genre)
@@ -76,7 +77,7 @@ def get_my_recommend(user_id: int, session: Session = Depends(get_session)) -> L
         ))
         .group_by(Track.genre)
         .order_by(func.count().desc())
-        .limit(2)
+        .limit(genre_limit)
     )
     user_genres = list(session.exec(stmt).all())
 

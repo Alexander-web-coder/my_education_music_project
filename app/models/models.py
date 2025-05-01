@@ -5,7 +5,7 @@ from sqlmodel import SQLModel, Field as SQLField, UniqueConstraint
 
 class Track(SQLModel, table=True):
     __table_args__ = (
-        UniqueConstraint('title', 'author', name='treck_and_author_constraint'),
+        UniqueConstraint('title', 'author', name='track_and_author_constraint'),
     )
     id: int = SQLField(default=None, nullable=False, primary_key=True)
     title: str

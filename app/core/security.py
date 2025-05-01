@@ -1,13 +1,14 @@
-from passlib.context import CryptContext
+"""Модуль  аутентификации"""
 from datetime import datetime, timedelta
+from passlib.context import CryptContext
 from jose import jwt, JWTError
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from app.db import get_session
 from sqlmodel import select
 from app.models.models import User
 from app.config import settings as cnf
-#from app.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from app.db import get_session
+
 
 
 SECRET_KEY = cnf.secret_key
@@ -20,18 +21,22 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
 
 def hash_password(password: str) -> str:
+    """Хэширование пароля"""
     return pwd_context.hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Проверка пароля"""
     return pwd_context.verify(plain_password, hashed_password)
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
+    """Создание токена"""
     to_encode = data.copy()
     expire = datetime.now() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 def decode_token(token: str):
+    """Расшифровка токена"""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload.get("sub")
@@ -39,6 +44,7 @@ def decode_token(token: str):
         return None
 
 def get_current_user(token: str = Depends(oauth2_scheme), session = Depends(get_session)) -> User:
+    """Текущий пользователь"""
     login = decode_token(token)
     if not login:
         raise HTTPException(status_code=401, detail="Невалидный токен")

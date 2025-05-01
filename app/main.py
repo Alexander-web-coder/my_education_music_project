@@ -1,19 +1,15 @@
 """Главный модуль"""
-from fastapi import FastAPI
-from app.routers import tracks, users, ratings
-from fastapi import APIRouter, status, Depends, HTTPException, Request
-from fastapi.responses import JSONResponse
-from sqlalchemy.exc import SQLAlchemyError, InternalError, IntegrityError
-
 from contextlib import asynccontextmanager
+from fastapi import FastAPI, status
+from app.routers import tracks, users, ratings
 from .db import init_database
 
+
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(application: FastAPI):
     """Асинхронный генератор"""
     init_database()
     yield
-
 
 app = FastAPI(
     lifespan=lifespan,
@@ -32,8 +28,11 @@ app = FastAPI(
     }
 )
 
+
+
 @app.get("/", status_code=status.HTTP_200_OK)
 def root():
+    """Заглавная страница"""
     return {"Информация":"перейдите на http://127.0.0.1:8000/docs"}
 
 

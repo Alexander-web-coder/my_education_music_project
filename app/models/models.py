@@ -1,10 +1,10 @@
 """Описание структуры таблиц"""
-from markdown_it.rules_block import table
-from pygments.lexer import default
+
 from sqlmodel import SQLModel, Field as SQLField, UniqueConstraint
 
 
 class Track(SQLModel, table=True):
+    """Модель треков"""
     __table_args__ = (
         UniqueConstraint('title', 'author', name='track_and_author_constraint'),
     )
@@ -14,6 +14,7 @@ class Track(SQLModel, table=True):
     genre: str
 
 class User(SQLModel, table=True):
+    """Модель пользователя"""
     id: int = SQLField(default=None, nullable=False, primary_key=True)
     login: str = SQLField(unique=True)
     first_name: str = SQLField(default=None, nullable=True)
@@ -22,6 +23,7 @@ class User(SQLModel, table=True):
     hashed_password: str
 
 class Ratings(SQLModel, table=True):
+    """Модель рейтинга"""
     __table_args__ = (
         UniqueConstraint('user_id', 'track_id', name='user_and_track_constraint'),
     )

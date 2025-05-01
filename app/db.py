@@ -3,8 +3,10 @@ from sqlmodel import create_engine, Session, SQLModel
 from app.config import settings as cnf
 
 # DB_URL = "postgresql://fastapi_music:fastapi_music@127.0.0.1:5432/music_project"
-DB_URL = f"postgresql://{cnf.db_username}:{cnf.db_password}@{cnf.db_host}" \
-        ":{cnf.db_port}/{cnf.db_name}"
+DB_URL = (
+        f"postgresql://{cnf.db_username}:{cnf.db_password}@{cnf.db_host}"
+        f":{cnf.db_port}/{cnf.db_name}"
+)
 
 engine = create_engine(DB_URL, echo=True)
 

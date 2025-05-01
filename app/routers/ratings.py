@@ -1,5 +1,5 @@
 """Модуль для операций с оценками (рейтингом)"""
-from typing import List
+from typing import List, Callable
 from fastapi import APIRouter, status, Depends, HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import Session, select, func, and_
@@ -7,6 +7,8 @@ from app.db import get_session
 from app.core.security import get_current_user
 from app.schemas.schemas_obj import Ratings
 from app.models.models import Ratings as Rating_db, Track
+
+func: Callable
 
 router = APIRouter(prefix="/ratings", tags=["Операции с оценками"])
 
@@ -117,11 +119,10 @@ def get_my_recommend(user_id: int, session: Session = Depends(get_session)) -> L
             Track.id))
 
     # Находим треки, которые юзер уже оценил
-    rated_tracks =[
-        track_id for (track_id) in session.exec(
+    rated_tracks =list(session.exec(
         select(Rating_db.track_id)
         .where(Rating_db.user_id == user_id)
-    ).all()]
+    ).all())
 
     # Исключаем оцененные треки
     if rated_tracks:

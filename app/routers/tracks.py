@@ -1,4 +1,4 @@
-#from http.client import HTTPException
+"""Модуль для операций с треками"""
 
 from fastapi import APIRouter, status, Depends, HTTPException
 from sqlmodel import Session, select, delete
@@ -10,14 +10,6 @@ from app.schemas.schemas_obj import Track
 
 
 router = APIRouter(prefix="/tracks", tags=["Операции с треками"])
-
-# @app.exception_handler(SQLAlchemyError)
-# async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
-#     # Для ошибок целостности (например, дублирование уникального ключа)
-#     return JSONResponse(
-#             status_code=400,
-#             content={"message": "Возможно, запись уже существует или нарушены ограничения базы данных"},
-#         )
 
 
 @router.get("/get_full_list", status_code=status.HTTP_200_OK)
@@ -41,7 +33,7 @@ def create_track(track: Track, session: Session = Depends(get_session)):
         session.refresh(new_track)
     except SQLAlchemyError as _:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Комбинация трек\автор должна быть уникальной.") from _
+                            detail="Комбинация трек-автор должна быть уникальной.") from _
     return new_track
 
 
@@ -71,5 +63,3 @@ def delete_track(track_id: int, session: Session = Depends(get_session)):
     # return for_delete
     # return results
     return  for_delete
-
-

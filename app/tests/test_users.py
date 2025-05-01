@@ -42,6 +42,14 @@ def test_create_track():
     assert response.status_code == 201
     client.new_track_id = response.json()['id']
 
+def test_set_rating():
+    response = client.patch("/ratings/set_rating",
+                           headers={"Authorization": f"Bearer {client.auth_token}"},
+                           json={"track_id": client.new_track_id,
+                                "estimate": 5})
+    assert response.status_code == 201
+    # assert response.json() == client.new_user_id
+
 def test_create_track_fail():
     response = client.post("/tracks/create_track",
                            json={"title": client.fake_title,
@@ -74,8 +82,3 @@ def test_get_main():
     assert response.status_code == 200
 
 
-
-# def test_me():
-#     response = client.get("/utils/me", headers={"Authorization": f"Bearer {client.auth_token}"})
-#     assert response.status_code == 200
-#     assert response.json() == client.new_user_id

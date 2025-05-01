@@ -1,7 +1,8 @@
+"""Модуль для операций с оценками (рейтингом)"""
+from typing import List
 from fastapi import APIRouter, status, Depends, HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import Session, select, func, and_
-from typing import List
 from app.db import get_session
 from app.core.security import get_current_user
 from app.schemas.schemas_obj import Ratings

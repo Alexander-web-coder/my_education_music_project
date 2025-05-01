@@ -1,3 +1,4 @@
+"""Описание структуры таблиц"""
 from markdown_it.rules_block import table
 from pygments.lexer import default
 from sqlmodel import SQLModel, Field as SQLField, UniqueConstraint

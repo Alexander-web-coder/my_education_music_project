@@ -22,7 +22,7 @@ class Ratings(BaseModel):
     """Оценка трека"""
     #hash: str
     track_id: int
-    estimate: int = Field(gt=0, lt=6)
+    estimate: int = Field(ge=1, le=5)
 
 
 class Token(BaseModel):

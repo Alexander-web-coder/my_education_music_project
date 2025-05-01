@@ -48,7 +48,7 @@ def test_set_rating():
                            json={"track_id": client.new_track_id,
                                 "estimate": 5})
     assert response.status_code == 201
-    # assert response.json() == client.new_user_id
+
 
 def test_create_track_fail():
     response = client.post("/tracks/create_track",

@@ -12,7 +12,7 @@ func: Callable
 
 router = APIRouter(prefix="/ratings", tags=["Операции с оценками"])
 
-@router.patch("/set_rating", status_code=status.HTTP_201_CREATED)
+@router.patch("/set_rating", status_code=status.HTTP_201_CREATED) #TODO
 def set_rating(rating: Ratings, login=Depends(get_current_user), session=Depends(get_session)) -> Rating_db:
     """Устанавливает оценку трека, требуется логин юзера"""
     # statement = select(User).where(User.login == login.login)
@@ -27,18 +27,17 @@ def set_rating(rating: Ratings, login=Depends(get_current_user), session=Depends
         session.add(new_rating)
         session.commit()
         session.refresh(new_rating)
-    except SQLAlchemyError as e:
+    except SQLAlchemyError as _:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Трека не существует."
-            )
+            detail="Трека не существует."
+            ) from _
     return new_rating
 
 
 
 @router.patch("/change_rating", status_code=status.HTTP_201_CREATED)
-def set_rating(rating: Ratings, login=Depends(get_current_user), session=Depends(get_session),
-               response_model=Ratings): # -> Rating_db:
+def change_rating(rating: Ratings, login=Depends(get_current_user), session=Depends(get_session)): # -> Rating_db:
     """Меняет оценку трека, требуется логин юзера"""
     # statement = select(User).where(User.login == login.login)
     # user_exist_id = session.exec(statement).first()
@@ -70,7 +69,7 @@ def set_rating(rating: Ratings, login=Depends(get_current_user), session=Depends
     except SQLAlchemyError as _:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Оценки не существует. Для создания оценки воспользуйтесь /set_rating."
+            detail="Оценки не существует. Для создания оценки воспользуйтесь /set_rating."
             ) from _
     return new_rating
 
@@ -100,7 +99,7 @@ def get_my_recommend(user_id: int, session: Session = Depends(get_session)) -> L
         select(Rating_db.user_id)
         .join(Track, Track.id == Rating_db.track_id)
         .where(and_(
-            Rating_db.user_id != user_id,
+        Rating_db.user_id != user_id,
             Rating_db.estimate >= 4,
             Track.genre.in_(user_genres)
         ))

@@ -12,7 +12,7 @@ func: Callable
 
 router = APIRouter(prefix="/ratings", tags=["Операции с оценками"])
 
-@router.patch("/set_rating", status_code=status.HTTP_201_CREATED) #TODO
+@router.patch("/set_rating", status_code=status.HTTP_201_CREATED)
 def set_rating(rating: Ratings, login=Depends(get_current_user),
                session=Depends(get_session)) -> Rating_db:
     """Устанавливает оценку трека, требуется логин юзера"""

@@ -1,7 +1,7 @@
 """Модуль тестирования"""
+from random import randint
 from fastapi.testclient import TestClient
 import faker
-from random import randint
 from app.main import app
 
 client = TestClient(app)

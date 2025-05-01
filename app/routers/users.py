@@ -1,3 +1,4 @@
+"""Роутеры"""
 from fastapi import APIRouter, status, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import  select

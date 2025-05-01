@@ -1,12 +1,11 @@
 #from http.client import HTTPException
 
-from fastapi import APIRouter, status, Depends, HTTPException, Request
-from sqlmodel import Session, select, delete, text
-from fastapi.responses import JSONResponse
-from sqlalchemy.exc import SQLAlchemyError, InternalError, IntegrityError
+from fastapi import APIRouter, status, Depends, HTTPException
+from sqlmodel import Session, select, delete
+from sqlalchemy.exc import SQLAlchemyError
 from app.db import  get_session
 from app.models.models import Track as Track_db, Ratings
-from app.schemas.schemas_obj import Track, DeleteTrack
+from app.schemas.schemas_obj import Track
 #from app.main import app
 
 

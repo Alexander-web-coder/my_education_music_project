@@ -1,3 +1,4 @@
+"""Модели для ФастАПИ(не для базы!)"""
 from pydantic import BaseModel, Field
 
 class Track(BaseModel):

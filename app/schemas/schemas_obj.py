@@ -1,5 +1,7 @@
 """Модели для ФастАПИ(не для базы!)"""
-from pydantic import BaseModel, Field, EmailStr
+import re
+from pydantic import BaseModel, Field, EmailStr, field_validator
+
 
 
 class Track(BaseModel):
@@ -11,11 +13,22 @@ class Track(BaseModel):
 
 class User(BaseModel):
     """Пользователь для веб-интерфейса"""
-    login: str
+    login: str = Field()
     password: str
     first_name: str | None = None
     last_name: str | None = None
     email: EmailStr | None = Field(default=None)
+
+    @field_validator('login')
+    def validate_login(cls, value):
+        """Проверка логина"""
+        if not value.strip():
+            raise ValueError("Логин не может быть пустым")
+        if ' ' in value:
+            raise ValueError("Логин не должен содержать пробелов")
+        if not re.match(r'^[a-zA-Z0-9_-]+$', value):
+            raise ValueError("Логин может содержать только буквы, цифры, '_' и '-'")
+        return value
 
 
 class Ratings(BaseModel):

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import track, users, ratings
+from app.routers import tracks, users, ratings
 from fastapi import APIRouter, status, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError, InternalError, IntegrityError

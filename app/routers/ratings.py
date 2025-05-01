@@ -67,11 +67,11 @@ def set_rating(rating: Ratings, login=Depends(get_current_user), session=Depends
         new_rating.estimate = rating.estimate
         session.commit()
         session.refresh(new_rating)
-    except SQLAlchemyError as e:
+    except SQLAlchemyError as _:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Оценки не существует. Для создания оценки воспользуйтесь /set_rating."
-            )
+            ) from _
     return new_rating
 
 @router.get("/get_my_recommend", status_code=status.HTTP_200_OK)
@@ -90,7 +90,7 @@ def get_my_recommend(user_id: int, session: Session = Depends(get_session)) -> L
         .order_by(func.count().desc())
         .limit(2)
     )
-    user_genres = [genre for (genre) in session.exec(stmt).all()]
+    user_genres = list(session.exec(stmt).all())
 
     if not user_genres:
         return []
@@ -107,14 +107,14 @@ def get_my_recommend(user_id: int, session: Session = Depends(get_session)) -> L
         .group_by(Rating_db.user_id)
         .having(func.count() >= 2)
     )
-    similar_users = [user_id for (user_id) in session.exec(stmt).all()]
+    similar_users = list(session.exec(stmt).all())
 
     if not similar_users:
         return []
 
     # Получаем треки, которые высоко оценили похожие юзеры
     stmt = (select(Track).join(Rating_db, Rating_db.track_id == Track.id).where(
-        and_(Rating_db.user_id.in_(similar_users),
+        and_(Rating_db.user_id.in_(similar_users), # pylint: disable=no-member
              Rating_db.estimate >= 4, Track.genre.in_(user_genres))).group_by(
             Track.id))
 
@@ -126,7 +126,7 @@ def get_my_recommend(user_id: int, session: Session = Depends(get_session)) -> L
 
     # Исключаем оцененные треки
     if rated_tracks:
-        stmt = stmt.where(Track.id.not_in(rated_tracks))
+        stmt = stmt.where(Track.id.not_in(rated_tracks)) # pylint: disable=no-member
 
     # Сортируем и ограничиваем результат
     stmt = (

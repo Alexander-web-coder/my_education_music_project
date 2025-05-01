@@ -1,10 +1,11 @@
 """Модели для ФастАПИ(не для базы!)"""
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
+
 
 class Track(BaseModel):
     """Трек"""
-    title: str
-    author: str
+    title: str = Field(max_length=80)
+    author: str = Field(max_length=100)
     genre: str = None
 
 
@@ -12,9 +13,9 @@ class User(BaseModel):
     """Пользователь"""
     login: str
     password: str
-    # first_name: str
-    # last_name: str
-    #hash: str надо подумать
+    first_name: str | None = None
+    last_name: str | None = None
+    email: EmailStr | None = Field(default=None)
 
 
 class Ratings(BaseModel):
@@ -23,8 +24,6 @@ class Ratings(BaseModel):
     track_id: int
     estimate: int = Field(gt=0, lt=6)
 
-# class DeleteTrack(BaseModel):
-#     id: int
 
 class Token(BaseModel):
     """Токен"""

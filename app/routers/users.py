@@ -16,7 +16,11 @@ def create_user(user: User_sh, session = Depends(get_session)) -> dict:
     user_exists = session.exec(select(User).where(User.login == user.login)).first()
     if user_exists:
         raise HTTPException(status_code=400, detail="Пользователь уже существует")
-    user_new = User(login=user.login, hashed_password=hash_password(user.password))
+    user_new = User(login=user.login,
+                    first_name=user.first_name,
+                    last_name=user.last_name,
+                    email=user.email,
+                    hashed_password=hash_password(user.password))
     session.add(user_new)
     session.commit()
     return {"message": "Пользователь зарегистрирован"}

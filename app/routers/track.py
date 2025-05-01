@@ -20,12 +20,6 @@ router = APIRouter(prefix="/tracks", tags=["Операции с треками"]
 #             content={"message": "Возможно, запись уже существует или нарушены ограничения базы данных"},
 #         )
 
-# для теста базы
-@router.get("/test-db", status_code=status.HTTP_200_OK)
-def test_database(session: Session = Depends(get_session)):
-    result = session.exec(select(text("'Hello world'"))).all()
-    return result
-
 
 @router.get("/get_full_list", status_code=status.HTTP_200_OK)
 def get_full_list(session: Session = Depends(get_session)):
@@ -49,7 +43,7 @@ def create_track(track: Track, session: Session = Depends(get_session)):
     except SQLAlchemyError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Комбинация трек\автор должна быть уникальной.")
-    return track
+    return new_track
 
 
 @router.delete("/delete_track", status_code=status.HTTP_204_NO_CONTENT)

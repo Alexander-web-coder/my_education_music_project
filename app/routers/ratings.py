@@ -18,6 +18,13 @@ def set_rating(rating: Ratings, login=Depends(get_current_user),
     """Устанавливает оценку трека, требуется логин юзера"""
     # statement = select(User).where(User.login == login.login)
     # user_exist_id = session.exec(statement).first()
+    stmt = select(Track).where(Track.id == rating.track_id)
+    check = session.exec(stmt).all()
+    if check == []:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Трека не существует."
+            )
     new_rating = Rating_db(
         # user_id  = user_exist_id.id,
         user_id = login.id,
@@ -31,7 +38,7 @@ def set_rating(rating: Ratings, login=Depends(get_current_user),
     except SQLAlchemyError as _:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Трека не существует."
+            detail="Оценка уже существует. Для изменения оценки воспользуйтесь /change_rating."
             ) from _
     return new_rating
 

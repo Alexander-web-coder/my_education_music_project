@@ -11,7 +11,7 @@ router = APIRouter(prefix="/users", tags=["Операции с пользова�
 
 @router.post("/create_user", status_code=status.HTTP_201_CREATED)
 # def create_user(login: str, password: str, session = Depends(get_session)):
-def create_user(user: User_sh, session = Depends(get_session)):
+def create_user(user: User_sh, session = Depends(get_session)) -> dict:
     """Создает нового пользователя"""
     user_exists = session.exec(select(User).where(User.login == user.login)).first()
     if user_exists:
@@ -22,7 +22,7 @@ def create_user(user: User_sh, session = Depends(get_session)):
     return {"message": "Пользователь зарегистрирован"}
 
 @router.post("/token", response_model=Token)
-def login(form_data: OAuth2PasswordRequestForm = Depends(), session = Depends(get_session)):
+def login(form_data: OAuth2PasswordRequestForm = Depends(), session = Depends(get_session)) -> dict:
     """Аутентифицирует пользователя, возвращает токен"""
     user = session.exec(select(User).where(User.login == form_data.username)).first()
     if not user or not verify_password(form_data.password, user.hashed_password):

@@ -46,7 +46,7 @@ def set_rating(rating: Ratings, login=Depends(get_current_user),
 
 @router.patch("/change_rating", status_code=status.HTTP_201_CREATED)
 def change_rating(rating: Ratings, login=Depends(get_current_user),
-                  session=Depends(get_session)): # -> Rating_db:
+                  session=Depends(get_session)) -> Rating_db:
     """Меняет оценку трека, требуется логин юзера"""
     # statement = select(User).where(User.login == login.login)
     # user_exist_id = session.exec(statement).first()

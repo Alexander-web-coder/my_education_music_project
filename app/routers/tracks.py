@@ -13,14 +13,14 @@ router = APIRouter(prefix="/tracks", tags=["Операции с треками"]
 
 
 @router.get("/get_full_list", status_code=status.HTTP_200_OK)
-def get_full_list(session: Session = Depends(get_session)):
+def get_full_list(session: Session = Depends(get_session)) -> list[Track_db]:
     """Возвращает полный лист треков"""
     result = session.exec(select(Track_db)).all()
     return result
 
 
 @router.post("/create_track", status_code=status.HTTP_201_CREATED)
-def create_track(track: Track, session: Session = Depends(get_session)):
+def create_track(track: Track, session: Session = Depends(get_session)) -> Track_db:
     """Создает запись о треке"""
     new_track = Track_db(
         title = track.title,
@@ -41,10 +41,6 @@ def create_track(track: Track, session: Session = Depends(get_session)):
 #def delete_track(track_id: DeleteTrack, session: Session = Depends(get_session)):
 def delete_track(track_id: int, session: Session = Depends(get_session)):
     """Каскадно удаляет запись о треке и его оценках. """
-    # for_delete = session.exec(select(Track_db).where(Track_db.id == track_id.id))
-    #stmt = select(Track_db).where(Track_db.id == track_id.id)
-    # stmt_track = select(Track_db).where(Track_db.id == track_id)
-    #stmt_rating = select(Ratings).where(Ratings.track_id == track_id)
     try:
         # удаляем все оценки трека. Если он не существует, ошибка не возникнет!
         stmt_rating = delete(Ratings).where(Ratings.track_id == track_id)
@@ -59,7 +55,4 @@ def delete_track(track_id: int, session: Session = Depends(get_session)):
     except SQLAlchemyError as _:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Трека не существует.") from _
-
-    # return for_delete
-    # return results
     return  for_delete

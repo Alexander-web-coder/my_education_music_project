@@ -31,7 +31,7 @@ app = FastAPI(
 
 
 @app.get("/", status_code=status.HTTP_200_OK)
-def root():
+def root() -> dict:
     """Заглавная страница"""
     return {"Информация":"перейдите на http://127.0.0.1:8000/docs"}
 

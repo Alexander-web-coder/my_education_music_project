@@ -96,16 +96,14 @@ def test_delete_track():
     response = client.delete("/tracks/delete_track",
                              headers={"Authorization": f"Bearer {client.auth_token}"},
                              params={"track_id": client.new_track_id})
-
     assert response.status_code == 204
-    # client.new_track_id = response.json()['id']
+
 
 def test_delete_track_fail():
     """Тест неудачного удаления трека"""
     response = client.delete("/tracks/delete_track",
                              headers={"Authorization": f"Bearer {client.auth_token}"},
                              params={"track_id": client.new_track_id})
-
     assert response.status_code == 400
 
 def test_get_main():

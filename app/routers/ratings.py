@@ -16,8 +16,7 @@ router = APIRouter(prefix="/ratings", tags=["Операции с оценкам�
 def set_rating(rating: Ratings, login=Depends(get_current_user),
                session=Depends(get_session)) -> Rating_db:
     """Устанавливает оценку трека, требуется логин юзера"""
-    # statement = select(User).where(User.login == login.login)
-    # user_exist_id = session.exec(statement).first()
+
     stmt = select(Track).where(Track.id == rating.track_id)
     check = session.exec(stmt).all()
     if check == []:
@@ -26,7 +25,6 @@ def set_rating(rating: Ratings, login=Depends(get_current_user),
             detail="Трека не существует."
             )
     new_rating = Rating_db(
-        # user_id  = user_exist_id.id,
         user_id = login.id,
         track_id = rating.track_id,
         estimate = rating.estimate
@@ -48,28 +46,10 @@ def set_rating(rating: Ratings, login=Depends(get_current_user),
 def change_rating(rating: Ratings, login=Depends(get_current_user),
                   session=Depends(get_session)) -> Rating_db:
     """Меняет оценку трека, требуется логин юзера"""
-    # statement = select(User).where(User.login == login.login)
-    # user_exist_id = session.exec(statement).first()
-    # new_rating = Rating_db(
-    #     # user_id  = user_exist_id.id,
-    #     user_id = login.id,
-    #     track_id = rating.track_id,
-    #     estimate = rating.estimate
-    # )
+
     stmt = select(Rating_db).where(and_(
         Rating_db.user_id == login.id,
         Rating_db.track_id == rating.track_id))
-    # new_rating = session.scalars(stmt).one()
-    # new_rating = session.exec(stmt).all()
-    # if new_rating == []:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_404_NOT_FOUND,
-    #         detail=f"Оценки не существует. Для создания оценки воспользуйтесь /set_rating."
-    #     )
-
-    # stmt = select(Rating_db).where(and_(
-    #     Rating_db.user_id == login.id,
-    #     Rating_db.track_id == rating.track_id))
     try:
         new_rating = session.scalars(stmt).one()
         new_rating.estimate = rating.estimate
@@ -144,5 +124,4 @@ def get_my_recommend(user_id: int, session: Session = Depends(get_session)) -> L
         )
         .limit(3)
     )
-
     return session.exec(stmt).all()

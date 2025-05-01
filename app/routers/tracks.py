@@ -7,7 +7,7 @@ from app.db import  get_session
 from app.models.models import Track as Track_db, Ratings
 from app.schemas.schemas_obj import Track
 from app.core.security import get_current_user
-#from app.main import app
+
 
 
 router = APIRouter(prefix="/tracks", tags=["Операции с треками"])
@@ -40,7 +40,6 @@ def create_track(track: Track, session: Session = Depends(get_session),
 
 
 @router.delete("/delete_track", status_code=status.HTTP_204_NO_CONTENT)
-#def delete_track(track_id: DeleteTrack, session: Session = Depends(get_session)):
 def delete_track(track_id: int, session: Session = Depends(get_session),
                  _ = Depends(get_current_user)):
     """Каскадно удаляет запись о треке и его оценках. Требуется авторизация. """

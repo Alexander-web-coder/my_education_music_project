@@ -30,7 +30,7 @@ app = FastAPI(
     }
 )
 
-@app.get("/")
+@app.get("/", status_code=status.HTTP_200_OK)
 def root():
     return {"Информация":"перейдите на http://127.0.0.1:8000/docs"}
 
@@ -42,6 +42,6 @@ def root():
 #             content={"message": "Нарушены ограничения базы данных. Запись не уникальна либо не существует."},
 #         )
 
-app.include_router(track.router)
+app.include_router(tracks.router)
 app.include_router(users.router)
 app.include_router(ratings.router)

@@ -47,10 +47,12 @@ def create_track(track: Track, session: Session = Depends(get_session)):
 
 
 @router.delete("/delete_track", status_code=status.HTTP_204_NO_CONTENT)
-def delete_track(track_id: DeleteTrack, session: Session = Depends(get_session)):
+#def delete_track(track_id: DeleteTrack, session: Session = Depends(get_session)):
+def delete_track(track_id: int, session: Session = Depends(get_session)):
     """Удаляет запись о треке."""
     # for_delete = session.exec(select(Track_db).where(Track_db.id == track_id.id))
-    stmt = select(Track_db).where(Track_db.id == track_id.id)
+    #stmt = select(Track_db).where(Track_db.id == track_id.id)
+    stmt = select(Track_db).where(Track_db.id == track_id)
     try:
         results = session.exec(stmt)
         for_delete = results.one()

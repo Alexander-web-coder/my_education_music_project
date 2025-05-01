@@ -13,7 +13,7 @@ client.fake_author = f"{fake.first_name()} {fake.first_name()}"
 client.fake_genre = fake.word(ext_word_list=("pop", "rock", "jazz", "classic"))
 client.new_user_id = 0
 client.auth_token = ""
-client.new_track_id = None
+client.new_track_id = 0
 
 
 def test_create_user():
@@ -41,6 +41,38 @@ def test_create_track():
     )
     assert response.status_code == 201
     client.new_track_id = response.json()['id']
+
+def test_create_track_fail():
+    response = client.post("/tracks/create_track",
+                           json={"title": client.fake_title,
+                                 "author": client.fake_author,
+                                 "genre": client.fake_genre}
+    )
+    assert response.status_code == 400
+
+
+def test_get_full_list():
+    response = client.get("/tracks/get_full_list")
+    assert response.status_code == 200
+    #client.new_track_id = response.json()['id']
+
+def test_delete_track():
+    response = client.delete("/tracks/delete_track",
+                             params={"track_id": client.new_track_id})
+
+    assert response.status_code == 204
+    # client.new_track_id = response.json()['id']
+
+def test_delete_track_fail():
+    response = client.delete("/tracks/delete_track",
+                             params={"track_id": client.new_track_id})
+
+    assert response.status_code == 400
+
+def test_get_main():
+    response = client.get("/")
+    assert response.status_code == 200
+
 
 
 # def test_me():

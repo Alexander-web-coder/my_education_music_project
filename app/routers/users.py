@@ -4,7 +4,7 @@ from sqlmodel import  select
 from app.db import  get_session
 from app.models.models import User
 from app.core.security import hash_password, verify_password, create_access_token
-from app.schemas.tracks import Token, User as User_sh
+from app.schemas.schemas_obj import Token, User as User_sh
 
 router = APIRouter(prefix="/users", tags=["Операции с пользователями"])
 

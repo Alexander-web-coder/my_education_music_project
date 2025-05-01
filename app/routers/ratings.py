@@ -4,7 +4,7 @@ from sqlmodel import Session, select, func, and_
 from typing import List
 from app.db import get_session
 from app.core.security import get_current_user
-from app.schemas.tracks import Ratings
+from app.schemas.schemas_obj import Ratings
 from app.models.models import Ratings as Rating_db, Track
 
 router = APIRouter(prefix="/ratings", tags=["Операции с оценками"])

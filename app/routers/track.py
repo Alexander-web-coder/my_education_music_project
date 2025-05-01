@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError, InternalError, IntegrityError
 from app.db import  get_session
 from app.models.models import Track as Track_db
-from app.schemas.tracks import Track, DeleteTrack
+from app.schemas.schemas_obj import Track, DeleteTrack
 #from app.main import app
 
 

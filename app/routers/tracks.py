@@ -6,6 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.db import  get_session
 from app.models.models import Track as Track_db, Ratings
 from app.schemas.schemas_obj import Track
+from app.core.security import get_current_user
 #from app.main import app
 
 
@@ -20,8 +21,9 @@ def get_full_list(session: Session = Depends(get_session)) -> list[Track_db]:
 
 
 @router.post("/create_track", status_code=status.HTTP_201_CREATED)
-def create_track(track: Track, session: Session = Depends(get_session)) -> Track_db:
-    """Создает запись о треке"""
+def create_track(track: Track, session: Session = Depends(get_session),
+                 _ = Depends(get_current_user)) -> Track_db:
+    """Создает запись о треке. Требуется авторизация."""
     new_track = Track_db(
         title = track.title,
         author = track.author,
@@ -39,8 +41,9 @@ def create_track(track: Track, session: Session = Depends(get_session)) -> Track
 
 @router.delete("/delete_track", status_code=status.HTTP_204_NO_CONTENT)
 #def delete_track(track_id: DeleteTrack, session: Session = Depends(get_session)):
-def delete_track(track_id: int, session: Session = Depends(get_session)):
-    """Каскадно удаляет запись о треке и его оценках. """
+def delete_track(track_id: int, session: Session = Depends(get_session),
+                 _ = Depends(get_current_user)):
+    """Каскадно удаляет запись о треке и его оценках. Требуется авторизация. """
     try:
         # удаляем все оценки трека. Если он не существует, ошибка не возникнет!
         stmt_rating = delete(Ratings).where(Ratings.track_id == track_id)
@@ -49,10 +52,9 @@ def delete_track(track_id: int, session: Session = Depends(get_session)):
         # удаляем трек из таблицы треков. Если его нет - ошибка возникнет!
         stmt_track = select(Track_db).where(Track_db.id == track_id)
         for_delete = session.exec(stmt_track).one()
-        # for_delete = results.one()
         session.delete(for_delete)
         session.commit()
     except SQLAlchemyError as _:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Трека не существует.") from _
+                            detail="Трек не существует.") from _
     return  for_delete

@@ -41,6 +41,7 @@ def test_token():
 def test_create_track():
     """Тест создания трека"""
     response = client.post("/tracks/create_track",
+                           headers={"Authorization": f"Bearer {client.auth_token}"},
                            json={"title": client.fake_title,
                                  "author": client.fake_author,
                                  "genre": client.fake_genre}
@@ -76,6 +77,7 @@ def test_set_rating_fail():
 def test_create_track_fail():
     """Тест неудачного создания трека"""
     response = client.post("/tracks/create_track",
+                           headers={"Authorization": f"Bearer {client.auth_token}"},
                            json={"title": client.fake_title,
                                  "author": client.fake_author,
                                  "genre": client.fake_genre}
@@ -92,6 +94,7 @@ def test_get_full_list():
 def test_delete_track():
     """Тест удаления трека"""
     response = client.delete("/tracks/delete_track",
+                             headers={"Authorization": f"Bearer {client.auth_token}"},
                              params={"track_id": client.new_track_id})
 
     assert response.status_code == 204
@@ -100,6 +103,7 @@ def test_delete_track():
 def test_delete_track_fail():
     """Тест неудачного удаления трека"""
     response = client.delete("/tracks/delete_track",
+                             headers={"Authorization": f"Bearer {client.auth_token}"},
                              params={"track_id": client.new_track_id})
 
     assert response.status_code == 400

@@ -6,7 +6,7 @@ from .db import init_database
 
 
 @asynccontextmanager
-async def lifespan(application: FastAPI):
+async def lifespan(application: FastAPI): # pylint: disable=unused-argument
     """Асинхронный генератор"""
     init_database()
     yield

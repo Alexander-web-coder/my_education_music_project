@@ -39,9 +39,9 @@ def create_track(track: Track, session: Session = Depends(get_session)):
         session.add(new_track)
         session.commit()
         session.refresh(new_track)
-    except SQLAlchemyError as e:
+    except SQLAlchemyError as _:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Комбинация трек\автор должна быть уникальной.")
+                            detail="Комбинация трек\автор должна быть уникальной.") from _
     return new_track
 
 
@@ -64,9 +64,9 @@ def delete_track(track_id: int, session: Session = Depends(get_session)):
         # for_delete = results.one()
         session.delete(for_delete)
         session.commit()
-    except SQLAlchemyError as e:
+    except SQLAlchemyError as _:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Трека не существует.")
+                            detail="Трека не существует.") from _
 
     # return for_delete
     # return results

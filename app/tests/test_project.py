@@ -1,6 +1,7 @@
 """Модуль тестирования"""
 from fastapi.testclient import TestClient
 import faker
+from random import randint
 from app.main import app
 
 client = TestClient(app)
@@ -12,6 +13,7 @@ client.fake_login = fake.first_name()
 client.fake_title = " ".join(fake.words(2))
 client.fake_author = f"{fake.first_name()} {fake.first_name()}"
 client.fake_genre = fake.word(ext_word_list=("pop", "rock", "jazz", "classic"))
+client.fake_estimate = randint(1,5)
 client.new_user_id = 0
 client.auth_token = ""
 client.new_track_id = 0
@@ -51,8 +53,24 @@ def test_set_rating():
     response = client.patch("/ratings/set_rating",
                            headers={"Authorization": f"Bearer {client.auth_token}"},
                            json={"track_id": client.new_track_id,
-                                "estimate": 5})
+                                "estimate": client.fake_estimate})
     assert response.status_code == 201
+
+def test_change_rating():
+    """Тест изменения оценки"""
+    response = client.patch("/ratings/change_rating",
+                           headers={"Authorization": f"Bearer {client.auth_token}"},
+                           json={"track_id": client.new_track_id,
+                                "estimate": client.fake_estimate})
+    assert response.status_code == 201
+
+def test_set_rating_fail():
+    """Тест создания оценки"""
+    response = client.patch("/ratings/set_rating",
+                           headers={"Authorization": f"Bearer {client.auth_token}"},
+                           json={"track_id": 0, # предполагается, что такого трека не будет
+                                "estimate": client.fake_estimate})
+    assert response.status_code == 404
 
 
 def test_create_track_fail():

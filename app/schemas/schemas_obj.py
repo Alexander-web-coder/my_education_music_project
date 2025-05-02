@@ -20,7 +20,7 @@ class User(BaseModel):
     email: EmailStr | None = Field(default=None)
 
     @field_validator('login')
-    def validate_login(cls, value):
+    def validate_login(cls, value): # pylint: disable=no-self-argument
         """Проверка логина"""
         if not value.strip():
             raise ValueError("Логин не может быть пустым")

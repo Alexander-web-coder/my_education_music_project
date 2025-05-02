@@ -58,6 +58,7 @@ def test_set_rating():
                            json={"track_id": client.new_track_id,
                                 "estimate": client.fake_estimate})
     assert response.status_code == 201
+    assert response.json()['track_id'] == client.new_track_id
 
 def test_change_rating():
     """Тест изменения оценки"""

@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 import faker
 from app.main import app
 
+
 client = TestClient(app)
 fake = faker.Faker()
 
@@ -26,7 +27,8 @@ def test_create_user():
                                  "password": client.fake_user_password}
     )
     assert response.status_code == 201
-    client.new_user_id = response.json()
+    assert response.json()['message'] == "Пользователь зарегистрирован"
+    # client.new_user_id = response.json()['id']
 
 
 def test_token():
@@ -89,7 +91,7 @@ def test_get_full_list():
     """Тест получения списка треков"""
     response = client.get("/tracks/get_full_list")
     assert response.status_code == 200
-    #client.new_track_id = response.json()['id']
+
 
 def test_delete_track():
     """Тест удаления трека"""
@@ -109,4 +111,11 @@ def test_delete_track_fail():
 def test_get_main():
     """Тест начальной страницы"""
     response = client.get("/")
+    assert response.status_code == 200
+
+
+def test_get_my_recommend():
+    """Тест получения рекомендаций"""
+    response = client.get("/ratings/get_my_recommendations",
+                          params={"user_id": client.new_user_id})
     assert response.status_code == 200

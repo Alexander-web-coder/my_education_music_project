@@ -8,7 +8,7 @@ from app.core.security import get_current_user
 from app.schemas.schemas_obj import Ratings
 from app.models.models import Ratings as Rating_db, Track
 
-func: Callable
+func: Callable # нужно только для pylint
 
 router = APIRouter(prefix="/ratings", tags=["Операции с оценками"])
 

@@ -102,9 +102,13 @@ def get_my_recommend(user_id: int, session: Session = Depends(get_session)) -> L
         return []
 
     # Получаем треки, которые высоко оценили похожие юзеры
+    # stmt = (select(Track).join(Rating_db, Rating_db.track_id == Track.id).where(
+    #     and_(Rating_db.user_id.in_(similar_users), # pylint: disable=no-member
+    #          Rating_db.estimate >= 4, Track.genre.in_(user_genres))).group_by(
+    #         Track.id))
     stmt = (select(Track).join(Rating_db, Rating_db.track_id == Track.id).where(
         and_(Rating_db.user_id.in_(similar_users), # pylint: disable=no-member
-             Rating_db.estimate >= 4, Track.genre.in_(user_genres))).group_by(
+             Rating_db.estimate >= 4)).group_by(
             Track.id))
 
     # Находим треки, которые юзер уже оценил

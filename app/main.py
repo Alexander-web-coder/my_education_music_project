@@ -1,6 +1,8 @@
 """Главный модуль"""
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, status
+from fastapi import FastAPI, Request, status
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from app.routers import tracks, users, ratings
 from .db import init_database
 
@@ -28,12 +30,17 @@ app = FastAPI(
     }
 )
 
+templates = Jinja2Templates(directory="app/templates")
 
+@app.get("/", status_code=status.HTTP_200_OK, response_class=HTMLResponse)
+async def root(request: Request):
+    """Вывод страницы с приветствием"""
+    return templates.TemplateResponse(request, "index.html")
 
-@app.get("/", status_code=status.HTTP_200_OK, tags=["Главная страница"])
-def root() -> dict:
-    """Заглавная страница"""
-    return {"Для информации":"перейдите на http://127.0.0.1:80/docs"}
+# @app.get("/", status_code=status.HTTP_200_OK, tags=["Главная страница"])
+# def root() -> dict:
+#     """Заглавная страница"""
+#     return {"Для информации":"перейдите на http://127.0.0.1:80/docs"}
 
 
 app.include_router(tracks.router)

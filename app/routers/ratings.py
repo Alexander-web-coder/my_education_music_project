@@ -8,7 +8,9 @@ from app.core.security import get_current_user
 from app.schemas.schemas_obj import Ratings
 from app.models.models import Ratings as Rating_db, Track
 
+# pylint: disable=no-member
 func: Callable # нужно только для pylint
+
 
 router = APIRouter(prefix="/ratings", tags=["Операции с оценками"])
 
@@ -102,12 +104,8 @@ def get_my_recommend(user_id: int, session: Session = Depends(get_session)) -> L
         return []
 
     # Получаем треки, которые высоко оценили похожие юзеры
-    # stmt = (select(Track).join(Rating_db, Rating_db.track_id == Track.id).where(
-    #     and_(Rating_db.user_id.in_(similar_users), # pylint: disable=no-member
-    #          Rating_db.estimate >= 4, Track.genre.in_(user_genres))).group_by(
-    #         Track.id))
     stmt = (select(Track).join(Rating_db, Rating_db.track_id == Track.id).where(
-        and_(Rating_db.user_id.in_(similar_users), # pylint: disable=no-member
+        and_(Rating_db.user_id.in_(similar_users),
              Rating_db.estimate >= 4)).group_by(
             Track.id))
 
@@ -119,7 +117,7 @@ def get_my_recommend(user_id: int, session: Session = Depends(get_session)) -> L
 
     # Исключаем оцененные треки
     if rated_tracks:
-        stmt = stmt.where(Track.id.not_in(rated_tracks)) # pylint: disable=no-member
+        stmt = stmt.where(Track.id.not_in(rated_tracks))
 
     # Сортируем и ограничиваем результат
     stmt = (

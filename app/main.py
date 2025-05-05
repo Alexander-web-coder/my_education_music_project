@@ -8,7 +8,7 @@ from .db import init_database
 
 
 @asynccontextmanager
-async def lifespan(application: FastAPI): # pylint: disable=unused-argument
+async def lifespan(_: FastAPI):
     """Асинхронный контекст-менеджер"""
     init_database()
     yield
